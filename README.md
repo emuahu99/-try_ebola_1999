@@ -1,4 +1,4 @@
-# -try_ebola_1999
+# try_ebola_1999
 scripts for ebola 1999 
 
 
@@ -98,7 +98,76 @@ Effective search space used: 1079922
 cat query.fa 
 >NC_002549.1 Zaire ebolavirus isolate Ebola virus/H.sapiens-tc/COD/1976/Yambuku-Mayinga, complete genome
 CGGACTTTTTTTTTACACAAAAAGAAAGAAGAATTTTTAGGATCTTTTGTGTGCGAATAACTATGAGGAAGATTAATAA
-``
+```
+
+```
+#compasison by bwa mem 
+curl -O http://www.personal.psu.edu/iua1/courses/files/2014/data-14.tar.gz
+tar xzvf data-14.tar.gz
+```
+after the tar, it created 2 files, read1.fq and read2.fq. 
+```
+bwa mem ~/refs/852/ebola-1999.fa read1.fq read2.fq > results.sam
+```
+
+```
+#convert sam into bam
+samtools view -Sb results.sam > temp.bam
+# Sort the alignment.
+samtools sort temp.bam -oresults.bam
+#index the aligment
+samtools index results.bam
+# using samtools for filter, -f match the flag : remain the reads of match flag
+# -F filter the flags: delete the reads of match flag. 
+samtools view -f 16 results.bam
+samtools view -F 16 results.bam
+samtools view -F 16 results.bam |wc -l
+samtools view -c -F 16 results.bam
+```
+
+```
+# uniquely mapping reads.
+samtools view -c -q 1 results.bam
+20000
+```
+
+
+```
+# Count the high quality alignment.
+samtools view -c -q 40 results.bam
+20000
+```
+
+```
+# Using readseq transformig data
+sudo apt install readseq
+cd ~/edu/lec15
+# get the full genebanl sequence of ebola 1999
+efetch -db nucleotide -id NC_002549.1 -format gb > NC.gb
+# get the genbank format, change it into GFF files.
+readseq -format=GFF NC.gb
+# rename
+readseq -format=GFF -o NC-all.gff NC.gb
+
+Choose an output format (name or #): 
+1
+ubuntu@VM-0-17-ubuntu:~/edu/lec15$ ls
+mutations.txt  NC.gb	 read2.fq     results.bam.bai  temp.bam
+NC-all.gff     read1.fq  results.bam  results.sam
+
+# get the fasta file:
+readseq -format=FASTA -o NC.fa NC.gb
+
+cat NC-all.gff |egrep '\tgene\t'
+
+
+
+
+
+
+
+
+
 
 
 
