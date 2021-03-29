@@ -160,6 +160,8 @@ readseq -format=FASTA -o NC.fa NC.gb
 
 cat NC-all.gff |egrep '\tgene\t'
 
+```
+
 
 
 
